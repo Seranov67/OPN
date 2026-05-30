@@ -62,12 +62,13 @@ Add OPN Testnet to MetaMask manually or let the frontend auto-add it on connect.
 
 ## Deployed Contracts
 
-> Update these addresses after Remix deployment.
+> Плейсхолдери: `MYTOKEN_ADDRESS`, `FAUCET_ADDRESS` у `frontend/src/config.js` та `hackathon-application.md`.  
+> Після Remix: `bash scripts/apply-addresses.sh` або `.\scripts\apply-addresses.ps1`
 
-| Contract | Address                                      | Deploy TX |
-|----------|----------------------------------------------|-----------|
-| MyToken  | `0x0000000000000000000000000000000000000000` | [explorer link](#) |
-| Faucet   | `0x0000000000000000000000000000000000000000` | [explorer link](#) |
+| Contract | Address         | Deploy TX |
+|----------|-----------------|-----------|
+| MyToken  | MYTOKEN_ADDRESS | https://testnet.iopn.tech/tx/TX_MYTOKEN |
+| Faucet   | FAUCET_ADDRESS  | https://testnet.iopn.tech/tx/TX_FAUCET  |
 
 Chain ID: **984**
 

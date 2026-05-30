@@ -1,9 +1,10 @@
-// Contract addresses — update after Remix deployment
-export const TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const FAUCET_ADDRESS = "0x0000000000000000000000000000000000000000";
+// ── Замінити після деплою в Remix ─────────────────────────────────────────────
+export const TOKEN_ADDRESS = "MYTOKEN_ADDRESS"; // ← MyToken  0x...
+export const FAUCET_ADDRESS = "FAUCET_ADDRESS"; // ← Faucet   0x...
 
 export const CHAIN_ID = 984;
 export const CHAIN_ID_HEX = "0x3D8";
+export const RPC_URL = "https://testnet-rpc.iopn.tech"; // або https://faucet.YOUR_DOMAIN/rpc
 
 export const NETWORK = {
   chainId: CHAIN_ID_HEX,
@@ -13,22 +14,25 @@ export const NETWORK = {
     symbol: "OPN",
     decimals: 18,
   },
-  rpcUrls: ["https://testnet-rpc.iopn.tech"],
+  rpcUrls: [RPC_URL],
   blockExplorerUrls: ["https://testnet.iopn.tech"],
 };
 
+// ── ABI (мінімальний набір для фронтенду) ─────────────────────────────────────
 export const TOKEN_ABI = [
-  "function balanceOf(address account) view returns (uint256)",
+  "function name() view returns (string)",
   "function symbol() view returns (string)",
+  "function balanceOf(address) view returns (uint256)",
   "function decimals() view returns (uint8)",
+  "function transfer(address to, uint256 amount) returns (bool)",
 ];
 
 export const FAUCET_ABI = [
-  "function requestTokens() external",
+  "function requestTokens()",
   "function getFaucetBalance() view returns (uint256)",
   "function timeUntilNextRequest(address user) view returns (uint256)",
+  "function lastAccessTime(address) view returns (uint256)",
   "function DRIP_AMOUNT() view returns (uint256)",
-  "function COOLDOWN() view returns (uint256)",
   "event SendToken(address indexed to, uint256 amount)",
 ];
 
