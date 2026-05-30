@@ -1,10 +1,12 @@
-// ── Замінити після деплою в Remix ─────────────────────────────────────────────
-export const TOKEN_ADDRESS = "MYTOKEN_ADDRESS"; // ← MyToken  0x...
-export const FAUCET_ADDRESS = "FAUCET_ADDRESS"; // ← Faucet   0x...
+// Replace after deploying contracts on OPN Testnet (Chain ID 984)
+// See: docs/CONTRACTS.md
+
+export const TOKEN_ADDRESS = "MYTOKEN_ADDRESS"; // MyToken  → 0x...
+export const FAUCET_ADDRESS = "FAUCET_ADDRESS"; // Faucet   → 0x...
 
 export const CHAIN_ID = 984;
 export const CHAIN_ID_HEX = "0x3D8";
-export const RPC_URL = "https://testnet-rpc.iopn.tech"; // або https://faucet.YOUR_DOMAIN/rpc
+export const RPC_URL = "https://testnet-rpc.iopn.tech"; // or https://faucet.YOUR_DOMAIN/rpc
 
 export const NETWORK = {
   chainId: CHAIN_ID_HEX,
@@ -18,7 +20,6 @@ export const NETWORK = {
   blockExplorerUrls: ["https://testnet.iopn.tech"],
 };
 
-// ── ABI (мінімальний набір для фронтенду) ─────────────────────────────────────
 export const TOKEN_ABI = [
   "function name() view returns (string)",
   "function symbol() view returns (string)",

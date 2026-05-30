@@ -1,249 +1,218 @@
 # OPN Infrastructure Faucet
 
-High-availability ERC20 faucet on OPN Testnet with optional self-hosted RPC node behind Nginx.
+> High-availability ERC20 faucet running on a self-hosted OPN Chain RPC node behind Nginx.
+
+[![OPN Testnet](https://img.shields.io/badge/network-OPN%20Testnet-7c3aed)](https://testnet.iopn.tech)
+[![Chain ID](https://img.shields.io/badge/chain--id-984-blue)](https://testnet.iopn.tech)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+---
+
+## Overview
+
+Standard DeFi faucets depend on centralized public RPC endpoints with aggressive rate-limiting.
+This project eliminates that bottleneck by pairing a standard ERC20 faucet with a self-hosted
+OPN Chain full node, proxied through Nginx with TLS termination.
+
+**Stack:** Solidity 0.8.20 · OpenZeppelin v5 · React 18 · ethers.js v6 · Nginx · Ubuntu 22.04
+
+---
 
 ## Architecture
 
 ```
-┌──────────┐     HTTPS      ┌─────────────────────────────────────┐
-│   User   │ ──────────────▶│              Nginx (VPS)            │
-│ MetaMask │                │                                     │
-└──────────┘                │  /          →  /var/www/faucet (React)│
-                            │  /rpc       →  localhost:8545 (Node) │
-                            └──────────┬──────────────┬─────────────┘
-                                       │              │
-                              Static React      OPN Chain Node
-                              (ethers.js)       (JSON-RPC)
-                                       │              │
-                                       └──────┬───────┘
-                                              ▼
-                                    OPN Testnet (Chain ID: 984)
-                                    ┌─────────────────────┐
-                                    │  MyToken (OPIT)     │
-                                    │  Faucet Contract    │
-                                    └─────────────────────┘
+User (MetaMask)
+      │
+      ▼
+  React SPA  ──── HTTPS ────►  Nginx (VPS)
+                                    │
+                     ┌──────────────┴──────────────┐
+                     ▼                             ▼
+             /  → React build            /rpc → OPN Chain Node
+             (static files)              (localhost:8545)
+                                               │
+                                               ▼
+                                     Faucet Smart Contract
+                                     (Tendermint BFT, ~1s finality)
 ```
 
-**Flow:** MetaMask → React Frontend → Nginx → OPN Node → Smart Contracts
+---
+
+## Smart Contracts
+
+Deployed on **OPN Testnet** (Chain ID: 984)
+
+| Contract | Address | Explorer |
+|----------|---------|----------|
+| MyToken (OPIT) | `MYTOKEN_ADDRESS` | [View](https://testnet.iopn.tech/address/MYTOKEN_ADDRESS) |
+| Faucet | `FAUCET_ADDRESS` | [View](https://testnet.iopn.tech/address/FAUCET_ADDRESS) |
+
+**Deploy transactions:**
+- MyToken: [`TX_MYTOKEN`](https://testnet.iopn.tech/tx/TX_MYTOKEN)
+- Faucet: [`TX_FAUCET`](https://testnet.iopn.tech/tx/TX_FAUCET)
+
+> Replace placeholders after Remix deployment. See [Deployment Guide](#deployment).
+
+---
+
+## Features
+
+- **ERC20 Token (OPIT)** — 1,000,000 supply, 18 decimals, OpenZeppelin standard
+- **Faucet contract** — 100 OPIT per request, 24-hour cooldown per address
+- **Sybil protection** — on-chain rate limiting via `mapping(address => uint256)`
+- **Chain guard** — frontend auto-switches MetaMask to Chain ID 984
+- **Self-hosted RPC** — own OPN Chain node eliminates public RPC rate limits
+- **Nginx reverse proxy** — `/rpc` proxied to local node, CORS handled, TLS via Let's Encrypt
+
+---
 
 ## Project Structure
 
 ```
 opn-infra-faucet/
 ├── contracts/
-│   ├── MyToken.sol       # ERC20 token (1M OPIT)
-│   └── Faucet.sol        # Faucet with 24h rate limit
+│   ├── MyToken.sol          # ERC20 "OPN Infra Token" (OPIT), 1M supply
+│   └── Faucet.sol           # 100 OPIT / 24h cooldown, events, Sybil guard
 ├── frontend/
 │   ├── src/
-│   │   ├── App.js        # Main UI component
-│   │   └── config.js     # Contract addresses + ABI
+│   │   ├── App.js           # MetaMask connect, chain switch, TX states
+│   │   ├── App.css          # Dark theme, vanilla CSS
+│   │   └── config.js        # Contract addresses + ABI
 │   └── package.json
-├── nginx/
-│   └── nginx.conf        # VPS reverse proxy config (reference)
 ├── scripts/
-│   ├── setup-vps.sh      # VPS: Nginx + SSL (run on server)
-│   ├── deploy-frontend.ps1  # Build + scp (run on Windows)
-│   └── git-init.sh       # GitHub init + push (Git Bash)
+│   ├── setup-vps.sh         # Nginx + UFW + Let's Encrypt (run on VPS as root)
+│   ├── deploy-frontend.ps1  # npm build + scp to VPS (run on Windows)
+│   └── git-init.sh          # Git init + first commit + push
+├── docs/
+│   └── OPN_BUILDERS_SUBMISSION.md  # Hackathon submission copy
 └── README.md
 ```
 
-## Network Configuration
+---
 
-| Parameter  | Value                              |
-|------------|------------------------------------|
-| Network    | OPN Testnet                        |
-| Chain ID   | 984                                |
-| RPC        | https://testnet-rpc.iopn.tech      |
-| Symbol     | OPN                                |
-| Explorer   | https://testnet.iopn.tech          |
-| OPN Faucet | https://faucet.iopn.tech           |
+## Deployment
 
-Add OPN Testnet to MetaMask manually or let the frontend auto-add it on connect.
+### Prerequisites
 
-## Deployed Contracts
+- MetaMask with OPN Testnet added (Chain ID: 984)
+- Test OPN tokens from the [official faucet](https://faucet.iopn.tech)
+- VPS with Ubuntu 22.04, public IP, domain pointed to it
+- Node.js 18+ on local machine
 
-> Плейсхолдери: `MYTOKEN_ADDRESS`, `FAUCET_ADDRESS` у `frontend/src/config.js` та `hackathon-application.md`.  
-> Після Remix: `bash scripts/apply-addresses.sh` або `.\scripts\apply-addresses.ps1`
+---
 
-| Contract | Address         | Deploy TX |
-|----------|-----------------|-----------|
-| MyToken  | MYTOKEN_ADDRESS | https://testnet.iopn.tech/tx/TX_MYTOKEN |
-| Faucet   | FAUCET_ADDRESS  | https://testnet.iopn.tech/tx/TX_FAUCET  |
+### Step 1 — Deploy Smart Contracts (Remix IDE)
 
-Chain ID: **984**
+1. Open [remix.ethereum.org](https://remix.ethereum.org)
+2. Set MetaMask to **OPN Testnet (Chain ID 984)**
+3. Create `MyToken.sol`, paste contract code from `remix/MyToken.sol`
+4. **Compiler:** `0.8.20`, Optimization: `200 runs`
+5. **Environment:** `Injected Provider - MetaMask`
+6. Deploy `MyToken` → copy contract address
+7. Deploy `Faucet` with `tokenAddress = <MyToken address>`
+8. Call `MyToken.transfer(faucetAddress, 500000000000000000000000)`
+9. Verify: `Faucet.getFaucetBalance()` should return `500000000000000000000000`
 
-## Автодеплой (замість Remix)
+Update `frontend/src/config.js`:
 
-Якщо є гаманець з тестовими OPN:
+```js
+export const TOKEN_ADDRESS  = "0x...";   // MyToken address
+export const FAUCET_ADDRESS = "0x...";   // Faucet address
+```
+
+---
+
+### Step 2 — VPS Setup
+
+Edit variables at the top of the script, then run on your VPS:
 
 ```bash
-# 1. Скопіювати .env.example → .env
-# 2. Вставити приватний ключ MetaMask (НЕ надсилати в чат!)
-DEPLOYER_PRIVATE_KEY=0x...
+# Edit DOMAIN and EMAIL in the script first
+nano scripts/setup-vps.sh
 
-# 3. OPN на gas: https://faucet.iopn.tech
-npm run deploy
+chmod +x scripts/setup-vps.sh
+sudo ./scripts/setup-vps.sh
 ```
 
-Скрипт задеплоїть MyToken + Faucet, поповнить кран 500k OPIT і оновить `config.js`, `README.md`, `hackathon-application.md`.
+The script handles: Nginx install, UFW rules, site config, SSL via certbot.
 
-Remix-версії контрактів: папка `remix/`.
+**Ports opened by UFW:**
 
-## Quick Deploy (після Remix)
+| Port | Protocol | Purpose |
+|------|----------|---------|
+| 22   | TCP | SSH |
+| 80   | TCP | HTTP → redirects to HTTPS |
+| 443  | TCP | HTTPS |
+| 26656 | TCP | OPN Chain P2P |
 
-```
-Remix → адреси контрактів
-    ↓
-config.js оновлено
-    ↓
-setup-vps.sh (на VPS)
-    ↓
-deploy-frontend.ps1 (локально, Windows)
-    ↓
-git-init.sh (локально, Git Bash)
-    ↓
-Заявка на хакатон
-```
+---
 
-### 1. `scripts/setup-vps.sh` — на VPS від root
+### Step 3 — Deploy Frontend
 
-Змінити вгорі файлу: `DOMAIN`, `EMAIL`
-
-```bash
-chmod +x setup-vps.sh
-sudo ./setup-vps.sh
-```
-
-### 2. `scripts/deploy-frontend.ps1` — локально (PowerShell)
-
-Змінити: `$VPS_USER`, `$VPS_IP`, `$DOMAIN`
+Edit `$VPS_USER`, `$VPS_IP`, `$DOMAIN` at the top of the script, then run on Windows:
 
 ```powershell
 .\scripts\deploy-frontend.ps1
 ```
 
-### 3. `scripts/git-init.sh` — локально (Git Bash)
+This builds the React app and uploads it to `/var/www/faucet/` on the VPS.
 
-Змінити: `GITHUB_USERNAME`, запускати з кореня проєкту
+---
+
+### Step 4 — GitHub
 
 ```bash
+# Edit GITHUB_USERNAME in the script first
 bash scripts/git-init.sh
 ```
 
-## Day 1 — Smart Contracts (Remix)
+---
 
-### 1. Get test OPN
-
-Visit https://faucet.iopn.tech and request test OPN for gas.
-
-### 2. Deploy MyToken
-
-1. Open [Remix IDE](https://remix.ethereum.org)
-2. Create `MyToken.sol` from `contracts/MyToken.sol`
-3. Compiler: **0.8.20**, enable optimization (200 runs)
-4. Environment: **Injected Provider — MetaMask** (OPN Testnet)
-5. Deploy → sign transaction
-6. Copy contract address from Remix console
-
-### 3. Deploy Faucet
-
-1. Create `Faucet.sol` from `contracts/Faucet.sol`
-2. Deploy with constructor parameter: **MyToken address**
-3. Copy Faucet address
-
-### 4. Fund the Faucet
-
-In Remix, call on MyToken contract:
-
-```
-transfer(faucet_address, 500000000000000000000000)
-```
-
-This sends 500,000 OPIT (with 18 decimals) to the faucet.
-
-### 5. Verify on Explorer
-
-Open https://testnet.iopn.tech, find both contracts, save deploy TX links for the hackathon submission.
-
-## Day 2 — Infrastructure (VPS)
-
-### Server Setup
+### Step 5 — After Remix: Final Update
 
 ```bash
-apt update && apt upgrade -y
-apt install -y nginx certbot python3-certbot-nginx ufw git curl
+git add frontend/src/config.js README.md
+git commit -m "chore: add deployed contract addresses (OPN Testnet 984)"
+git push
 
-ufw allow 22/tcp
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw allow 26656/tcp   # P2P node
-ufw deny 26657/tcp    # RPC — only via Nginx
-ufw enable
+# Rebuild and redeploy frontend
+.\scripts\deploy-frontend.ps1
 ```
 
-### OPN Chain Node (optional, +points)
+---
 
-Follow official docs: https://iopn.gitbook.io/developer-docs/node-overview
-
-If skipped, the frontend uses the public RPC (`https://testnet-rpc.iopn.tech`).
-
-### Nginx + SSL
-
-```bash
-cp nginx/nginx.conf /etc/nginx/sites-available/faucet
-ln -s /etc/nginx/sites-available/faucet /etc/nginx/sites-enabled/
-nginx -t && systemctl reload nginx
-
-mkdir -p /var/www/faucet
-certbot --nginx -d faucet.your-domain.com
-```
-
-Replace `faucet.your-domain.com` in the config with your actual domain.
-
-## Day 3 — Frontend
-
-### Local Development
+## Running Locally
 
 ```bash
 cd frontend
 npm install
+npm start
+# → http://localhost:3000
 ```
 
-Update `frontend/src/config.js` with deployed contract addresses:
+Make sure MetaMask is set to OPN Testnet before connecting.
 
-```js
-export const TOKEN_ADDRESS = "0xYourMyTokenAddress";
-export const FAUCET_ADDRESS = "0xYourFaucetAddress";
-```
+---
 
-```bash
-npm start     # http://localhost:3000
-npm run build # production build
-```
+## OPN Testnet Reference
 
-### Deploy to VPS
+| Parameter | Value |
+|-----------|-------|
+| Network Name | OPN Testnet |
+| Chain ID | 984 (0x3d8) |
+| RPC URL | https://testnet-rpc.iopn.tech |
+| Currency | OPN |
+| Min Gas Price | 7 Gwei |
+| Block Explorer | https://testnet.iopn.tech |
+| Official Faucet | https://faucet.iopn.tech |
 
-```bash
-scp -r build/* user@vps:/var/www/faucet/
-```
+---
 
-## Interface Screenshot
+## OPN Builders Submission
 
-<!-- Replace with actual screenshot after deployment -->
-![Faucet UI](./docs/screenshot.png)
+Copy-paste guide for the hackathon form: [docs/OPN_BUILDERS_SUBMISSION.md](docs/OPN_BUILDERS_SUBMISSION.md)
 
-## Hackathon Submission
-
-| Field       | Value |
-|-------------|-------|
-| Project     | OPN Infrastructure Faucet |
-| Tagline     | High-availability ERC20 faucet on self-hosted OPN RPC node |
-| Demo URL    | https://faucet.your-domain.com |
-| Repository  | https://github.com/you/opn-infra-faucet |
-| Problem     | Dependency on public RPCs with rate-limiting |
-| Solution    | Self-hosted node + Nginx proxy + ERC20 faucet |
-| How it works| MetaMask → React → Nginx → OPN Node → Smart Contract |
-| Roadmap     | Neo ID KYC integration for Sybil protection on Mainnet |
+---
 
 ## License
 

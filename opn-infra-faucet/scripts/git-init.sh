@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
+# Publish repo to GitHub. Docs: docs/DEPLOYMENT.md (Phase A)
 set -euo pipefail
 
-# ── Змінити ────────────────────────────────────────────────────────────────────
+# ── Edit before running ───────────────────────────────────────────────────────
 GITHUB_USERNAME="your-username"
-# ──────────────────────────────────────────────────────────────────────────────
-
-# Виконувати з кореня проєкту: d:\OPN\opn-infra-faucet\
+# ─────────────────────────────────────────────────────────────────────────────
 
 cd "$(dirname "$0")/.."
 
@@ -15,10 +14,10 @@ git add .
 git commit -m "feat: OPN Infrastructure Faucet - initial release
 
 - ERC20 MyToken (OPIT, 1M supply)
-- Faucet contract (100 OPIT / 24h, Sybil protection)
+- Faucet contract (100 OPIT / 24h cooldown)
 - React frontend with MetaMask, Chain ID 984 auto-switch
-- Nginx reverse proxy config (RPC + static)
-- Self-hosted OPN Testnet RPC node setup docs"
+- Nginx reverse proxy (RPC + static)
+- English docs and OPN Builders submission templates"
 
 echo "[2/3] remote..."
 git branch -M main
@@ -28,9 +27,9 @@ echo "[3/3] push..."
 git push -u origin main
 
 echo ""
-echo "✓ Репозиторій опубліковано."
+echo "Done. Repository: https://github.com/${GITHUB_USERNAME}/opn-infra-faucet"
 echo ""
-echo "Після деплою контрактів у Remix:"
-echo "  git add README.md frontend/src/config.js"
-echo "  git commit -m \"chore: add deployed contract addresses (OPN Testnet)\""
+echo "After contract deploy, update config.js and run:"
+echo "  git add frontend/src/config.js README.md"
+echo "  git commit -m \"chore: add deployed contract addresses (OPN Testnet 984)\""
 echo "  git push"

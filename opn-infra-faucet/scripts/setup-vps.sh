@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── Змінити перед запуском ─────────────────────────────────────────────────────
-DOMAIN="faucet.your-domain.com"     # ← ваш домен
-EMAIL="admin@your-domain.com"       # ← для Let's Encrypt
+# Edit before running. Docs: docs/DEPLOYMENT.md (Phase B)
+DOMAIN="faucet.your-domain.com"     # YOUR_DOMAIN
+EMAIL="admin@your-domain.com"       # Let's Encrypt email
 # ──────────────────────────────────────────────────────────────────────────────
 
 NGINX_CONF="/etc/nginx/sites-available/faucet"

@@ -1,6 +1,4 @@
-# Одна операція після Remix — заповнити змінні нижче і запустити:
-#   .\scripts\apply-addresses.ps1
-
+# Replace placeholders after contract deploy. Docs: docs/CONTRACTS.md
 $MYTOKEN = "0x..."
 $FAUCET  = "0x..."
 $TX_MYTOKEN = "0x..."
@@ -29,4 +27,13 @@ $c = $c -replace "YOUR_DOMAIN", $DOMAIN
 $c = $c -replace "YOUR_GITHUB", $GITHUB
 Set-Content $app $c -NoNewline
 
-Write-Host "✓ Оновлено: config.js, hackathon-application.md" -ForegroundColor Green
+$readme = Join-Path $Root "README.md"
+$c = Get-Content $readme -Raw
+$c = $c -replace "MYTOKEN_ADDRESS", $MYTOKEN
+$c = $c -replace "FAUCET_ADDRESS", $FAUCET
+$c = $c -replace "TX_MYTOKEN", $TX_MYTOKEN
+$c = $c -replace "TX_FAUCET", $TX_FAUCET
+Set-Content $readme $c -NoNewline
+
+Write-Host "Updated: config.js, hackathon-application.md, README.md" -ForegroundColor Green
+Write-Host "Next: .\scripts\deploy-frontend.ps1" -ForegroundColor Cyan
