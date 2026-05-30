@@ -3,5 +3,8 @@ build/
 dist/
 .env
 .env.local
+deployed.json
+cache/
+artifacts/
 .DS_Store
 *.log
