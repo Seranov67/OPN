@@ -19,7 +19,16 @@ Placeholders in README and `config.js` are intentional until Phase C.
 
 ---
 
-## Phase B — VPS + HTTPS (no contracts required)
+## Phase B — VPS + Node + HTTPS (no contracts required)
+
+### B0. OPN Chain node (optional, recommended for sysadmin track)
+
+```bash
+chmod +x scripts/setup-node.sh
+sudo ./scripts/setup-node.sh
+```
+
+Then download binary, genesis, and seeds per script output. Docs: https://iopn.gitbook.io/developer-docs/node-overview
 
 ### B1. On the VPS (as root)
 

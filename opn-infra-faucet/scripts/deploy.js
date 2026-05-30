@@ -25,7 +25,7 @@ async function main() {
 
   console.log("\n[1/3] Deploy MyToken...");
   const MyToken = await hre.ethers.getContractFactory("MyToken");
-  const token = await MyToken.deploy();
+  const token = await MyToken.deploy(deployer.address);
   await token.waitForDeployment();
   const tokenTx = token.deploymentTransaction().hash;
   const tokenAddress = await token.getAddress();

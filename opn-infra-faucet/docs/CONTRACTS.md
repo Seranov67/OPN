@@ -6,27 +6,28 @@ Deploy on **OPN Testnet** — Chain ID **984**.
 
 1. MetaMask on OPN Testnet (984)
 2. Test OPN for gas: https://faucet.iopn.tech
-3. Files in `remix/` folder (Remix-compatible imports)
+3. Files in `remix/` folder
 
 ## Steps
 
 ### 1. Deploy MyToken
 
 1. Open https://remix.ethereum.org
-2. Create `MyToken.sol` — paste from `remix/MyToken.sol`
+2. Paste `remix/MyToken.sol`
 3. Compiler: **0.8.20**, Optimization **200 runs**
 4. Environment: **Injected Provider — MetaMask**
-5. Deploy → sign → copy **contract address** and **deploy TX hash**
+5. Deploy with constructor **`initialOwner`** = your wallet address
+6. Copy contract address and deploy TX hash
 
 ### 2. Deploy Faucet
 
-1. Create `Faucet.sol` — paste from `remix/Faucet.sol` or `contracts/Faucet.sol`
-2. Deploy with constructor: `tokenAddress` = **MyToken address from step 1**
-3. Copy **Faucet address** and **deploy TX hash**
+1. Paste `remix/Faucet.sol`
+2. Deploy with **`tokenAddress`** = MyToken address from step 1
+3. Copy Faucet address and deploy TX hash
 
 ### 3. Fund the faucet
 
-In Remix, on **MyToken** → `transfer`:
+On **MyToken** → `transfer`:
 
 | Field | Value |
 |-------|-------|
@@ -35,33 +36,34 @@ In Remix, on **MyToken** → `transfer`:
 
 ### 4. Verify
 
-On **Faucet** → `getFaucetBalance()` → should return `500000000000000000000000`.
+On **Faucet**:
+
+- `getFaucetBalance()` → `500000000000000000000000`
+- `amountAllowed()` → `100000000000000000000` (100 OPIT)
+- `cooldownRemaining(yourAddress)` → `0` before first claim
 
 ### 5. Update the project
 
-Replace placeholders in `frontend/src/config.js`:
-
 ```javascript
-export const TOKEN_ADDRESS = "0x...";  // MyToken
-export const FAUCET_ADDRESS = "0x...";  // Faucet
+// frontend/src/config.js
+export const TOKEN_ADDRESS = "0x...";
+export const FAUCET_ADDRESS = "0x...";
 ```
 
-Explorer links:
+Rebuild: `.\scripts\deploy-frontend.ps1`
 
-```
-https://testnet.iopn.tech/tx/<TX_MYTOKEN>
-https://testnet.iopn.tech/tx/<TX_FAUCET>
-```
+## Owner functions (optional)
 
-Rebuild frontend — see [DEPLOYMENT.md](./DEPLOYMENT.md) Phase B2.
+After deploy, Faucet owner can call:
+
+- `setAmountAllowed(uint256)` — change drip size
+- `withdrawAll(address)` — emergency token recovery
 
 ## Automated alternative
 
 ```bash
 cp .env.example .env
-# Add DEPLOYER_PRIVATE_KEY=0x... (never commit .env)
+# DEPLOYER_PRIVATE_KEY=0x...
 npm install
 npm run deploy
 ```
-
-Updates `config.js`, README, and `hackathon-application.md` automatically.

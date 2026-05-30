@@ -8,7 +8,7 @@ import {
   NETWORK,
   TOKEN_ABI,
   FAUCET_ABI,
-  DRIP_AMOUNT,
+  DEFAULT_DRIP_AMOUNT,
 } from "./config";
 import "./App.css";
 
@@ -41,6 +41,7 @@ function App() {
   const [faucetBalance, setFaucetBalance] = useState(null);
   const [userBalance, setUserBalance] = useState(null);
   const [tokenSymbol, setTokenSymbol] = useState("OPIT");
+  const [dripAmount, setDripAmount] = useState(DEFAULT_DRIP_AMOUNT);
   const [cooldown, setCooldown] = useState(0);
   const [status, setStatus] = useState(STATUS.IDLE);
   const [errorMsg, setErrorMsg] = useState("");
@@ -52,17 +53,19 @@ function App() {
     const token = new ethers.Contract(TOKEN_ADDRESS, TOKEN_ABI, prov);
     const faucet = new ethers.Contract(FAUCET_ADDRESS, FAUCET_ABI, prov);
 
-    const [fBal, uBal, symbol, remaining] = await Promise.all([
+    const [fBal, uBal, symbol, remaining, allowed] = await Promise.all([
       faucet.getFaucetBalance(),
       token.balanceOf(addr),
       token.symbol(),
-      faucet.timeUntilNextRequest(addr),
+      faucet.cooldownRemaining(addr),
+      faucet.amountAllowed(),
     ]);
 
     setFaucetBalance(fBal);
     setUserBalance(uBal);
     setTokenSymbol(symbol);
     setCooldown(Number(remaining));
+    setDripAmount(allowed);
   }, []);
 
   const checkChain = useCallback(async () => {
@@ -255,7 +258,7 @@ function App() {
 
           <div className="card">
             <h2>Drip Amount</h2>
-            <p className="balance">{formatTokens(DRIP_AMOUNT)} {tokenSymbol}</p>
+            <p className="balance">{formatTokens(dripAmount)} {tokenSymbol}</p>
           </div>
 
           <div className="card">
@@ -286,7 +289,7 @@ function App() {
 
           {status === STATUS.SUCCESS && (
             <div className="alert alert-success">
-              <p>Successfully received {formatTokens(DRIP_AMOUNT)} {tokenSymbol}!</p>
+              <p>Successfully received {formatTokens(dripAmount)} {tokenSymbol}!</p>
               {txHash && (
                 <a
                   href={`https://testnet.iopn.tech/tx/${txHash}`}

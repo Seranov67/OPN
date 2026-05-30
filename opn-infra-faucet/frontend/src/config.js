@@ -31,10 +31,10 @@ export const TOKEN_ABI = [
 export const FAUCET_ABI = [
   "function requestTokens()",
   "function getFaucetBalance() view returns (uint256)",
-  "function timeUntilNextRequest(address user) view returns (uint256)",
+  "function cooldownRemaining(address user) view returns (uint256)",
+  "function amountAllowed() view returns (uint256)",
   "function lastAccessTime(address) view returns (uint256)",
-  "function DRIP_AMOUNT() view returns (uint256)",
   "event SendToken(address indexed to, uint256 amount)",
 ];
 
-export const DRIP_AMOUNT = 100n * 10n ** 18n;
+export const DEFAULT_DRIP_AMOUNT = 100n * 10n ** 18n;

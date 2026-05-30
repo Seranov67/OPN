@@ -1,20 +1,20 @@
 # OPN Builders — Submission Guide
 
-> Open this file next to the submission form at the OPN Builders portal.
-> Copy each block into the corresponding field. Replace placeholders as instructed.
+> Open alongside the OPN Builders portal form.
+> All blocks are copy-paste ready. Replace placeholders per the table below.
 
 ---
 
-## Placeholders — replace before submitting
+## Placeholders
 
 | Placeholder | Replace with | When |
 |-------------|-------------|------|
-| `YOUR_GITHUB` | your GitHub username | after `git push` |
-| `YOUR_DOMAIN` | your domain (without https://) | after VPS + SSL |
-| `MYTOKEN_ADDRESS` | MyToken contract address from Remix | after contract deployment |
-| `FAUCET_ADDRESS` | Faucet contract address from Remix | after contract deployment |
-| `TX_MYTOKEN` | MyToken deploy TX hash | after contract deployment |
-| `TX_FAUCET` | Faucet deploy TX hash | after contract deployment |
+| `YOUR_GITHUB` | GitHub username | after `git push` |
+| `YOUR_DOMAIN` | domain without https:// | after VPS + SSL |
+| `MYTOKEN_ADDRESS` | MyToken address from Remix | after Remix deploy |
+| `FAUCET_ADDRESS` | Faucet address from Remix | after Remix deploy |
+| `TX_MYTOKEN` | MyToken deploy TX hash | after Remix deploy |
+| `TX_FAUCET` | Faucet deploy TX hash | after Remix deploy |
 
 ---
 
@@ -23,13 +23,13 @@
 **Project name**
 
 ```
-OPN Infrastructure Faucet
+OPN Infrastructure Faucet & Node Monitor
 ```
 
 **One-line tagline**
 
 ```
-High-availability ERC20 faucet on self-hosted OPN Chain RPC node behind Nginx
+High-availability ERC20 Token Faucet running on a self-hosted OPN Chain RPC node
 ```
 
 **Demo URL**
@@ -38,7 +38,7 @@ High-availability ERC20 faucet on self-hosted OPN Chain RPC node behind Nginx
 https://faucet.YOUR_DOMAIN
 ```
 
-> Replace `YOUR_DOMAIN` after VPS and SSL are up. Verify the URL loads before submitting.
+> Ensure 100% uptime during the judging period.
 
 **Repository URL**
 
@@ -46,13 +46,11 @@ https://faucet.YOUR_DOMAIN
 https://github.com/YOUR_GITHUB/opn-infra-faucet
 ```
 
-> Replace `YOUR_GITHUB` after `git push`. Repository must be **public**.
+> Must be public. README must describe architecture and local run instructions.
 
 ---
 
 ## STEP 2 — Contracts
-
-> Fill this step only after Remix deployment.
 
 **MyToken (OPIT)**
 
@@ -81,30 +79,30 @@ Deploy TX: https://testnet.iopn.tech/tx/TX_FAUCET
 **Problem**
 
 ```
-DeFi developers on OPN Testnet rely on centralized public RPC endpoints
-with aggressive rate-limiting and no uptime guarantees. There is no
-stable, self-sovereign infrastructure for distributing test tokens,
-which slows down the smart contract development and testing cycle.
+DeFi developers on OPN Testnet rely on centralized public RPC endpoints with
+aggressive rate-limiting and no uptime guarantees. There is no stable,
+sovereign infrastructure for distributing test tokens, which slows down the
+smart contract development and testing cycle.
 ```
 
 **Solution**
 
 ```
-A decentralized ERC20 faucet connected to a self-hosted OPN Chain full
-node behind an Nginx reverse proxy with TLS. This architecture eliminates
-rate-limiting and single points of failure, providing uninterrupted access
-to test liquidity for the entire developer ecosystem.
+A decentralized ERC20 faucet connected to a self-hosted OPN Chain full node
+behind an Nginx reverse proxy with TLS. The node runs with RocksDB backend
+and tuned Tendermint P2P parameters, eliminating rate-limiting and single
+points of failure for the entire developer ecosystem.
 ```
 
 **How it works**
 
 ```
 1. User connects an EVM-compatible wallet (MetaMask).
-2. React frontend automatically switches to OPN Testnet (Chain ID 984).
-3. Requests route through Nginx → private RPC endpoint → self-hosted OPN node.
-4. Faucet contract validates Sybil protection (24h on-chain cooldown per address).
+2. React frontend auto-switches to OPN Testnet (Chain ID 984).
+3. Requests route through Nginx (/rpc) → localhost:8545 → self-hosted OPN node.
+4. Faucet contract verifies on-chain Sybil guard (24h cooldown per address).
 5. Tendermint BFT finalizes the transaction in ~1 second.
-6. UI updates faucet and user balances in real time via ethers.js event listeners.
+6. UI updates balances in real time via ethers.js listeners.
 ```
 
 ---
@@ -113,33 +111,29 @@ to test liquidity for the entire developer ecosystem.
 
 ```
 Phase 1 — Current (OPN Testnet):
-  - ERC20 faucet deployed with self-hosted RPC node
-  - Nginx reverse proxy: SSL, CORS, security headers
-  - On-chain Sybil protection (24h cooldown)
+  ✓ ERC20 faucet with self-hosted OPN Chain full node
+  ✓ RocksDB backend, tuned P2P, UFW port isolation
+  ✓ Nginx reverse proxy with TLS, CORS, Sybil protection
 
 Phase 2 — Post-Mainnet:
-  - Production deployment on OPN Chain Mainnet
-  - Neo ID ZK-KYC integration for enhanced Sybil resistance
+  → Production deployment on OPN Chain Mainnet
+  → Neo ID ZK-KYC integration for enhanced Sybil resistance
 
 Phase 3 — Ecosystem tooling:
-  - Node Telemetry dashboard with public performance metrics
-    for developers integrating with OPN Chain
-  - Multi-token faucet support for other ERC20 projects on OPN
+  → Node Telemetry dashboard — public node metrics for OPN developers
+  → Multi-token faucet for other ERC20 projects on OPN Chain
 ```
 
 ---
 
 ## STEP 5 — Review checklist
 
-Before clicking Submit, verify:
-
-- [ ] Demo URL opens over HTTPS without errors
-- [ ] MetaMask connects and shows Chain ID 984
-- [ ] "Request tokens" button works (test after Remix)
-- [ ] GitHub repository is **public** and README is complete
-- [ ] Contract addresses link correctly in testnet.iopn.tech
-- [ ] All placeholders replaced: `YOUR_DOMAIN`, `YOUR_GITHUB`,
-      `MYTOKEN_ADDRESS`, `FAUCET_ADDRESS`, `TX_MYTOKEN`, `TX_FAUCET`
+- [ ] Demo URL loads over HTTPS without errors
+- [ ] MetaMask connects, Chain ID shows 984
+- [ ] "Request tokens" button works end-to-end
+- [ ] GitHub repo is **public**, README covers architecture + local run
+- [ ] Contract addresses are clickable on testnet.iopn.tech
+- [ ] All 6 placeholders replaced
 
 ---
 
