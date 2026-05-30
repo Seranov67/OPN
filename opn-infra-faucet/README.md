@@ -72,6 +72,23 @@ Add OPN Testnet to MetaMask manually or let the frontend auto-add it on connect.
 
 Chain ID: **984**
 
+## Автодеплой (замість Remix)
+
+Якщо є гаманець з тестовими OPN:
+
+```bash
+# 1. Скопіювати .env.example → .env
+# 2. Вставити приватний ключ MetaMask (НЕ надсилати в чат!)
+DEPLOYER_PRIVATE_KEY=0x...
+
+# 3. OPN на gas: https://faucet.iopn.tech
+npm run deploy
+```
+
+Скрипт задеплоїть MyToken + Faucet, поповнить кран 500k OPIT і оновить `config.js`, `README.md`, `hackathon-application.md`.
+
+Remix-версії контрактів: папка `remix/`.
+
 ## Quick Deploy (після Remix)
 
 ```
