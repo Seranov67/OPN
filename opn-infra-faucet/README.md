@@ -39,7 +39,11 @@ opn-infra-faucet/
 │   │   └── config.js     # Contract addresses + ABI
 │   └── package.json
 ├── nginx/
-│   └── nginx.conf        # VPS reverse proxy config
+│   └── nginx.conf        # VPS reverse proxy config (reference)
+├── scripts/
+│   ├── setup-vps.sh      # VPS: Nginx + SSL (run on server)
+│   ├── deploy-frontend.ps1  # Build + scp (run on Windows)
+│   └── git-init.sh       # GitHub init + push (Git Bash)
 └── README.md
 ```
 
@@ -66,6 +70,47 @@ Add OPN Testnet to MetaMask manually or let the frontend auto-add it on connect.
 | Faucet   | `0x0000000000000000000000000000000000000000` | [explorer link](#) |
 
 Chain ID: **984**
+
+## Quick Deploy (після Remix)
+
+```
+Remix → адреси контрактів
+    ↓
+config.js оновлено
+    ↓
+setup-vps.sh (на VPS)
+    ↓
+deploy-frontend.ps1 (локально, Windows)
+    ↓
+git-init.sh (локально, Git Bash)
+    ↓
+Заявка на хакатон
+```
+
+### 1. `scripts/setup-vps.sh` — на VPS від root
+
+Змінити вгорі файлу: `DOMAIN`, `EMAIL`
+
+```bash
+chmod +x setup-vps.sh
+sudo ./setup-vps.sh
+```
+
+### 2. `scripts/deploy-frontend.ps1` — локально (PowerShell)
+
+Змінити: `$VPS_USER`, `$VPS_IP`, `$DOMAIN`
+
+```powershell
+.\scripts\deploy-frontend.ps1
+```
+
+### 3. `scripts/git-init.sh` — локально (Git Bash)
+
+Змінити: `GITHUB_USERNAME`, запускати з кореня проєкту
+
+```bash
+bash scripts/git-init.sh
+```
 
 ## Day 1 — Smart Contracts (Remix)
 
